@@ -47,14 +47,39 @@ function Post (user, obj){
 	this.id = obj.id || null;
 	this.title = obj.title || "";
 	this.body = obj.body || "";
+
+	this.commentsUrl = function(){
+		return `https://jsonplaceholder.typicode.com/posts/${this.id}/comments`;
+	}
+	// this.fetch = function(){
+	// 	 return fetch(this.Url())
+	// 	.then(response => response.json())
+	// 	.then(data => {
+	// 		this.name = data.name;
+	// 		return Promise.resolve(this);
+	// 	})
+	// 	 };
+	this.loadComments = function () {
+		return fetch(this.commentsUrl())
+ 		.then(response => response.json())
+ 		.then(data => {
+ 			this.comments = data;
+ 			return Promise.resolve(this);
+ 		});
+	};
 }
+
+
 
 let leanne = new User({id : 1});
 leanne
 .fetch() // load the data
 .then(() => leanne.loadTodos()) // load the todos
 .then(() => leanne.loadPosts())
-.then(() => console.log("Leanne with todos:", leanne));
+.then(() => Promise.all( leanne.posts.map(post => post.loadComments())) )
+.then(() => console.log("Leanne with todos:", leanne))
+// .then(() => console.log("Leanne with todos:", JSON.stringify(leanne.posts[0].comments)))
+;
 
 let ervin = new User({id : 2});
 ervin
