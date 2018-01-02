@@ -46,7 +46,7 @@ function User (obj){
    return fetch(this.commentsUrl())
    .then(response => response.json())
    .then(data => {
-     this.comments = data;
+     this.comments = data.map(comment => new Comment(this,comment));
      return Promise.resolve(this);
    });
  };
@@ -71,10 +71,10 @@ function Post (user, obj){
 
 }
 // comments Constructor
-function Comments (user, obj){
+function Comment (user, post){
   this.user = user;
-  this.id = obj.id || null;
-  this.title = obj.title || "";
+  this.id = post.id || null;
+  this.title = post.title || "";
 }
 
 
