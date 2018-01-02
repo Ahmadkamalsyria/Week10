@@ -14,6 +14,10 @@ function User (obj){
   this.postsUrl = function(){
     return `${ this.url() }/posts`;
   };
+  this.commentsUrl = function(){
+    return `https://jsonplaceholder.typicode.com/posts/${this.id}/comments`;
+  }
+
 	this.fetch = function(){
 		return fetch(this.url())
 		.then(response => response.json())
@@ -38,6 +42,15 @@ function User (obj){
  			return Promise.resolve(this);
  		});
  };
+ this.loadComments = function () {
+   return fetch(this.commentsUrl())
+   .then(response => response.json())
+   .then(data => {
+     this.comments = data;
+     return Promise.resolve(this);
+   });
+ };
+
 };
 
 // post constructor
@@ -47,10 +60,6 @@ function Post (user, obj){
 	this.id = obj.id || null;
 	this.title = obj.title || "";
 	this.body = obj.body || "";
-
-	this.commentsUrl = function(){
-		return `https://jsonplaceholder.typicode.com/posts/${this.id}/comments`;
-	}
 	// this.fetch = function(){
 	// 	 return fetch(this.Url())
 	// 	.then(response => response.json())
@@ -59,14 +68,13 @@ function Post (user, obj){
 	// 		return Promise.resolve(this);
 	// 	})
 	// 	 };
-	this.loadComments = function () {
-		return fetch(this.commentsUrl())
- 		.then(response => response.json())
- 		.then(data => {
- 			this.comments = data;
- 			return Promise.resolve(this);
- 		});
-	};
+
+}
+// comments Constructor
+function Comments (user, obj){
+  this.user = user;
+  this.id = obj.id || null;
+  this.title = obj.title || "";
 }
 
 
@@ -76,7 +84,8 @@ leanne
 .fetch() // load the data
 .then(() => leanne.loadTodos()) // load the todos
 .then(() => leanne.loadPosts())
-.then(() => Promise.all( leanne.posts.map(post => post.loadComments())) )
+//.then(() => Promise.all( leanne.posts.map(post => post.loadComments())) )
+.then(()=> leanne.loadComments())
 .then(() => console.log("Leanne with todos:", leanne))
 // .then(() => console.log("Leanne with todos:", JSON.stringify(leanne.posts[0].comments)))
 ;
@@ -86,6 +95,7 @@ ervin
 .fetch() // load the data
 .then(() => ervin.loadTodos()) // load the todos
 .then(() => ervin.loadPosts())
+.then(()=>ervin.loadComments())
 .then(() => console.log("Ervin with todos:", ervin));
 
 function Todo (user, obj){
